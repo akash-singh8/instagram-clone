@@ -1,24 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import Navigation from "./components/Navigation";
+import Content from "./components/Content";
+import Login from "./components/Login";
+import Create from "./components/Create";
+import "./App.css";
+
+import { auth } from "./firebase";
 
 function App() {
+  const [notLogged, setNotLogged] = useState(true);
+
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if (user?.emailVerified) setNotLogged(false);
+    });
+  }, []);
+
+  function logOut() {
+    auth.signOut();
+    setNotLogged(true);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
+    <>
+      <Navigation logOut={logOut} notLogged={notLogged} />
+      <section>
+        {notLogged ? <Login setNotLogged={setNotLogged} /> : <Content />}
+      </section>
+      {notLogged ? "" : <Create />}
+
+      <footer>
+        Developed with ❤️ by{" "}
         <a
-          className="App-link"
-          href="https://reactjs.org"
+          href="https://www.linkedin.com/in/akash-singh8/"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noreferrer"
         >
-          Learn React
+          ~Akash
         </a>
-      </header>
-    </div>
+      </footer>
+    </>
   );
 }
 
